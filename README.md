@@ -11,11 +11,13 @@ prompts/                              paste-and-run prompts (any agent with a GT
   meta-pixel-gtm-zid-prompt.md
   snap-pixel-gtm-zid-prompt.md
   tiktok-pixel-gtm-zid-prompt.md
+  chatgpt-ads-pixel-gtm-zid-prompt.md
 
 skills/                               the same builds packaged as Claude skills
   meta-pixel-gtm-zid/     SKILL.md + reference.md
   snap-pixel-gtm-zid/     SKILL.md + reference.md
   tiktok-pixel-gtm-zid/   SKILL.md + reference.md
+  chatgpt-ads-pixel-gtm-zid/  SKILL.md + reference.md
 ```
 
 | Platform | Events built | Zid dataLayer events used |
@@ -23,16 +25,17 @@ skills/                               the same builds packaged as Claude skills
 | Meta Pixel | PageView, ViewContent, AddToCart, InitiateCheckout, AddPaymentInfo, Purchase | `view_item`, `add_to_cart`, `begin_checkout`, `add_payment_info`, `purchase` |
 | Snap Pixel | PAGE_VIEW, VIEW_CONTENT, ADD_CART, START_CHECKOUT, ADD_BILLING, PURCHASE | same |
 | TikTok Pixel | Base code (Pageview), ViewContent, AddToCart, InitiateCheckout, AddPaymentInfo, CompletePayment / Purchase | same |
+| ChatGPT Ads (OpenAI) | page_viewed, contents_viewed, items_added, checkout_started, order_created | `view_item`, `add_to_cart`, `begin_checkout`, `purchase` |
 
 ## Requirements
 
 - A GTM MCP server connected to the agent, with edit access to the client's container.
-- The platform's tag template installed in the container from the Community Template Gallery: **Meta Pixel** (facebook), **Snap Pixel** (Snap Inc.), **TikTok Pixel** (tiktok). The agent stops and asks if it is missing.
+- The platform's tag template installed in the container from the Community Template Gallery: **Meta Pixel** (facebook), **Snap Pixel** (Snap Inc.), **TikTok Pixel** (tiktok). The agent stops and asks if it is missing. ChatGPT Ads has no template — its tags are Custom HTML, so nothing needs installing.
 - The pixel ID for the platform.
 
 ## Using a prompt
 
-1. Open the prompt file and fill in the three lines under **INPUTS**.
+1. Open the prompt file and fill in the inputs (**INPUTS** at the top, or **Step 0** in the ChatGPT Ads prompt).
 2. Paste the whole file into the agent.
 3. Read the report, test in GTM Preview, then publish yourself.
 
@@ -51,8 +54,9 @@ Then ask for the work in plain language — for example *"set up the Meta Pixel 
 - **Naming.** Tags `EA - <Platform> - <event>`, platform variables `EA - <Platform> - <snake_case>`, variables shared between platforms `EA - Core - <snake_case>`. One folder per platform plus `EA - Core`. Change the `EA` prefix to your own if you fork this.
 - **IDs live in Constant variables**, never hardcoded in a tag.
 - **Existing triggers are reused**, never duplicated, and nothing that already exists in the container is renamed.
-- **Advanced Matching differs per platform on purpose.** Meta receives the plain email and phone (its pixel hashes them); Snap and TikTok receive Zid's pre-hashed values.
-- **Revenue is `ecommerce.value`** on every platform, so the platforms agree with each other.
+- **Advanced Matching differs per platform on purpose.** Meta receives the plain email and phone (its pixel hashes them); Snap and TikTok receive Zid's pre-hashed values; ChatGPT Ads gets email and phone hashed in the browser with OpenAI's own normalisation, because Zid's hashes did not match it.
+- **Revenue is `ecommerce.value`** on every platform, so the platforms agree with each other. ChatGPT Ads receives it in minor units (74.25 SAR → `7425`), as OpenAI requires.
+- **The ChatGPT Ads build works in its own workspace** (`EA - OpenAI Pixel`), the same as the Salla version.
 
 ## Notes
 
